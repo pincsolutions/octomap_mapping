@@ -29,24 +29,24 @@ class CheckSlots:
 		self.octomap_pcl_sub = rospy.Subscriber('/octomap_point_cloud_centers', PointCloud2, self.octomap_pcl_callback, queue_size = 1)
 		self.fcu_pose_sub = rospy.Subscriber('/mavros/local_position/pose', PoseStamped, self.fcu_pose_callback)
 
-		self.slots = {'A2005':[8.16, -3, 0, 1.2575, 1.23, 0.2, 0, 0],
-					'B2005':[8.16, -3, 1.23, 1.2575, 1.23, 0.2, 0, 0],
-					'C2005':[8.16, -3, 2.46, 1.2575, 0.74  , 0.2, 0, 0],
-					'A2004':[6.9025, -3, 0, 1.2575, 1.23, 0.2, 0, 0],
-					'B2004':[6.9025, -3, 1.23, 1.2575, 1.23, 0.2, 0, 0],
-					'C2004':[6.9025, -3, 2.46, 1.2575, 0.74  , 0.2, 0, 0],
-					'A2003':[5.645, -3, 0, 1.565, 1.23, 0.2, 0, 0],
-					'B2003':[5.645, -3, 1.23, 1.565, 1.23, 0.2, 0, 0],
-					'C2003':[5.645, -3, 2.46, 1.565, 0.74  , 0.2, 0, 0],
-					'A2002':[4.08, -3, 0, 1.5655, 1.23, 0.2, 0, 0],
-					'B2002':[4.08, -3, 1.23, 1.565, 1.23, 0.2, 0,  0],
-					'C2002':[4.08, -3, 2.46, 1.565, 0.74  , 0.2, 0, 0],
-					'A2001':[2.515, -3, 0, 1.2575, 1.23, 0.2, 0, 0],
-					'B2001':[2.515, -3, 1.23, 1.2575, 1.23, 0.2, 0, 0],
-					'C2001':[2.515, -3, 2.46, 1.2575, 0.74  , 0.2, 0, 0],
-					'A2000':[1.2575, -3, 0, 1.2575, 1.23, 0.2, 0, 0],
-					'B2000':[1.2575, -3, 1.23, 1.2575, 1.23, 0.2, 0, 0],
-					'C2000':[1.2575, -3, 2.46, 1.2575, 0.74  , 0.2, 0, 0]}
+		self.slots = {'A2005':[8.16, -3, 0, 1.2575, 1.23, 0.4, 0, 0],
+					'B2005':[8.16, -3, 1.23, 1.2575, 1.23, 0.4, 0, 0],
+					'C2005':[8.16, -3, 2.46, 1.2575, 0.74  , 0.4, 0, 0],
+					'A2004':[6.9025, -3, 0, 1.2575, 1.23, 0.4, 0, 0],
+					'B2004':[6.9025, -3, 1.23, 1.2575, 1.23, 0.4, 0, 0],
+					'C2004':[6.9025, -3, 2.46, 1.2575, 0.74  , 0.4, 0, 0],
+					'A2003':[5.645, -3, 0, 1.565, 1.23, 0.4, 0, 0],
+					'B2003':[5.645, -3, 1.23, 1.565, 1.23, 0.4, 0, 0],
+					'C2003':[5.645, -3, 2.46, 1.565, 0.74  , 0.4, 0, 0],
+					'A2002':[4.08, -3, 0, 1.5655, 1.23, 0.4, 0, 0],
+					'B2002':[4.08, -3, 1.23, 1.565, 1.23, 0.4, 0,  0],
+					'C2002':[4.08, -3, 2.46, 1.565, 0.74  , 0.4, 0, 0],
+					'A2001':[2.515, -3, 0, 1.2575, 1.23, 0.4, 0, 0],
+					'B2001':[2.515, -3, 1.23, 1.2575, 1.23, 0.4, 0, 0],
+					'C2001':[2.515, -3, 2.46, 1.2575, 0.74  , 0.4, 0, 0],
+					'A2000':[1.2575, -3, 0, 1.2575, 1.23, 0.4, 0, 0],
+					'B2000':[1.2575, -3, 1.23, 1.2575, 1.23, 0.4, 0, 0],
+					'C2000':[1.2575, -3, 2.46, 1.2575, 0.74  , 0.4, 0, 0]}
 		#self.publish_slot(self.slots)
 
 	def fcu_pose_callback(self, msg):
@@ -85,7 +85,7 @@ class CheckSlots:
 		# Consider south flight only for now
 		for cell in xyz:
 			for key, value in self.slots.items():
-				if (value[0]-value[3]<=cell[0]<=value[0]) and (value[1]-value[5]<=cell[1]<=value[1]) and (value[2]<=cell[2]<=value[2]+value[4]):
+				if (value[0]-value[3]<=cell[0]<=value[0]) and (value[1]-value[5]<=cell[1]<=value[1]+0.15) and (value[2]<=cell[2]<=value[2]+value[4]):
 						value[6] += 1
 						value[7] += cell[1]
 		
@@ -99,13 +99,17 @@ class CheckSlots:
 		"""
 		self.publish_slot(self.slots)
 
-
-		print "\n   %8d %8d %8d %8d %8d %8d" % (2005, 2004, 2003, 2002, 2001, 2000)
 		
+		print "\n   %8d %8d %8d %8d %8d %8d" % (2005, 2004, 2003, 2002, 2001, 2000)
+		print("counts/slot:")
 		#print "%8.2f %8.2f %8.2f %8.2f " % (self.slots["C2003"][7]/self.slots["C2003"][6],self.slots["C2002"][7]/self.slots["C2002"][6], self.slots["C2001"][7]/self.slots["C2001"][6], self.slots["C2000"][7]/self.slots["C2000"][6])
 		print " %s %8d %8d %8d %8d %8d %8d" % ("C", self.slots["C2005"][6], self.slots["C2004"][6], self.slots["C2003"][6], self.slots["C2002"][6], self.slots["C2001"][6], self.slots["C2000"][6])
 		print " %s %8d %8d %8d %8d %8d %8d" % ("B", self.slots["B2005"][6], self.slots["B2004"][6], self.slots["B2003"][6], self.slots["B2002"][6], self.slots["B2001"][6], self.slots["B2000"][6])
 		print " %s %8d %8d %8d %8d %8d %8d" % ("A", self.slots["A2005"][6], self.slots["A2004"][6], self.slots["A2003"][6], self.slots["A2002"][6], self.slots["A2001"][6], self.slots["A2000"][6])
+		print "\npercent(%):"
+		print " %s %8.1f  %8.1f %8.1f %8.1f %8.1f %8.1f" % ("C", self.slots["C2005"][6]/2000.*133., self.slots["C2004"][6]/2000.*133., self.slots["C2003"][6]/2000.*133., self.slots["C2002"][6]/2000.*133., self.slots["C2001"][6]/2000.*133., self.slots["C2000"][6]/2000.*133.)
+		print " %s %8.1f %8.1f %8.1f %8.1f %8.1f %8.1f" % ("B", self.slots["B2005"][6]/20., self.slots["B2004"][6]/20., self.slots["B2003"][6]/20., self.slots["B2002"][6]/20., self.slots["B2001"][6]/20., self.slots["B2000"][6]/20.)
+		print " %s %8.1f %8.1f %8.1f %8.1f %8.1f %8.1f" % ("A", self.slots["A2005"][6]/20., self.slots["A2004"][6]/20., self.slots["A2003"][6]/20., self.slots["A2002"][6]/20., self.slots["A2001"][6]/20., self.slots["A2000"][6]/20.)
 		
 
 
@@ -117,6 +121,8 @@ class CheckSlots:
 		
 		i = 0
 		markerArray = MarkerArray()
+
+		# South flight only for now
 		for key,value in slots.items():
 
 			marker = Marker()
@@ -125,7 +131,7 @@ class CheckSlots:
 			marker.action = Marker.ADD
 			marker.id = i
 			marker.pose.position.x = value[0] - value[3]/2.;
-			marker.pose.position.y = value[1] + value[5]/2
+			marker.pose.position.y = value[1] - value[5]/2
 			marker.pose.position.z = value[2] + value[4]/2
 			marker.pose.orientation.x = 0.0
 			marker.pose.orientation.y = 0.0
