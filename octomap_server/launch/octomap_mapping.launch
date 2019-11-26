@@ -8,22 +8,26 @@
 -->
 
 <launch>
-    <group ns = 'zedm'>
-    	<include file='$(find zed_wrapper)/launch/zedm.launch">
-    	</include>
-    </group>
-	
 	<node pkg="octomap_server" type="octomap_server_node" name="octomap_server">
-		<param name="resolution" value="0.05" />
+		<param name="resolution" value="0.10" />
 		
 		<!-- fixed map frame (set to 'map' if SLAM or localization running!) -->
-		<param name="frame_id" type="string" value="odom_combined" />
+		<param name="frame_id" type="string" value="local_origin" />
 		
 		<!-- maximum range to integrate (speedup!) -->
-		<param name="sensor_model/max_range" value="5.0" />
+		<param name="sensor_model/max_range" value="3.5" />
+ 
+                <param name="pointcloud_min_z" value="1.0" />
+ 
+                <param name="latch"    value="true" />
+
+		<param name="sensor_model/min"   value="0.12" />
+		<param name="sensor_model/max"   value="0.70" />
+		<param name="sensor_model/hit"   value="0.6" />
+		<param name="sensor_model/miss"  value="0.3" />
 		
 		<!-- data source to integrate (PointCloud2) -->
-		<remap from="cloud_in" to="/narrow_stereo/points_filtered2" />
+		<remap from="cloud_in" to="/zedCloudsTransformed" />
 	
 	</node>
 </launch>
