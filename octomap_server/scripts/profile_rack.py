@@ -15,7 +15,17 @@ import math as m
 from visualization_msgs.msg import Marker, MarkerArray
 import pincair_msgs.msg
 
-class CheckSlots:
+
+def mission_status_service_request():
+	question = "No-QUESTION"
+	try:
+		rospy.wait_for_servie('/mission_status')
+		status = rospy.ServiceProxy('/mission_status', MissionStatus)
+		return status(question)
+	except rospy.ServiceException, err:
+		rospy.logerr("Slat Map: Service call failed: %s" % err)
+
+class ProfleSlots:
 
 	def __init__(self):
 			# To visualize each slot
@@ -49,9 +59,20 @@ class CheckSlots:
 					'C2000':[1.2575, -3, 2.46, 1.2575, 0.74  , 0.4, 0, 0]}
 		#self.publish_slot(self.slots)
 
-		self.den = 16.0    #16.0 for 0.05 resolution; 4.0 for 0.1 resolution
+		self.den = 16.0    #18.0 for 0.05 resolution; 4.0 for 0.1 resolution
 		self.bias = 200.0
-		self.bias1 = 0.0
+
+		# Download slot map from DC3
+		mission_status = missin_status_serive_request()
+		data = mission_status(data)
+		json_data = json.loads(data)
+		json_slots = json_data['pincair_map']['slot']
+		self.slots ={}
+		count = 0
+		for key, value in json_slots:
+			self.slots[key] = json_slots[key]['pose']+json_slot[key]['size']+ count
+
+	def load_slots_dict(self,slots):
 
 
 	def fcu_pose_callback(self, msg):
@@ -114,7 +135,7 @@ class CheckSlots:
 		print "\npercent(%):"
 		print " %s %8.1f %8.1f %8.1f %8.1f %8.1f %8.1f" % ("C", (self.slots["C2005"][6]-self.bias)/self.den*1.33, (self.slots["C2004"][6]-self.bias)/self.den*1.33, (self.slots["C2003"][6]-self.bias)/self.den*1.33, (self.slots["C2002"][6]-self.bias)/self.den*1.33, (self.slots["C2001"][6]-self.bias)/self.den*1.33, (self.slots["C2000"][6]-self.bias)/self.den*1.33)
 		print " %s %8.1f %8.1f %8.1f %8.1f %8.1f %8.1f" % ("B", (self.slots["B2005"][6]-self.bias)/self.den, (self.slots["B2004"][6]-self.bias)/self.den, (self.slots["B2003"][6]-self.bias)/self.den, (self.slots["B2002"][6]-self.bias)/self.den, (self.slots["B2001"][6]-self.bias)/self.den, (self.slots["B2000"][6]-self.bias)/self.den,)
-		print " %s %8.1f %8.1f %8.1f %8.1f %8.1f %8.1f" % ("A", (self.slots["A2005"][6]-self.bias1)/self.den, (self.slots["A2004"][6]-self.bias1)/self.den, (self.slots["A2003"][6]-self.bias1)/self.den, (self.slots["A2002"][6]-self.bias1)/self.den, (self.slots["A2001"][6]-self.bias1)/self.den, (self.slots["A2000"][6]-self.bias1)/self.den,)
+		print " %s %8.1f %8.1f %8.1f %8.1f %8.1f %8.1f" % ("A", (self.slots["A2005"][6]-self.bias)/self.den, (self.slots["A2004"][6]-self.bias)/self.den, (self.slots["A2003"][6]-self.bias)/self.den, (self.slots["A2002"][6]-self.bias)/self.den, (self.slots["A2001"][6]-self.bias)/self.den, (self.slots["A2000"][6]-self.bias)/self.den,)
 		
 
 
@@ -157,8 +178,8 @@ class CheckSlots:
 
 if __name__ == '__main__':
 	print("Computing occupied cells and average depth.......")
-	rospy.init_node('check_slot_node', anonymous=True)
+	rospy.init_node('check_slot_node', anonymous=False)
 	
-	CheckSlots()
+	ProfileSlots()
 
 	rospy.spin()
