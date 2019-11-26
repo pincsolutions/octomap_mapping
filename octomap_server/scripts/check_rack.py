@@ -15,6 +15,11 @@ import math as m
 from visualization_msgs.msg import Marker, MarkerArray
 import pincair_msgs.msg
 
+def pos(x):
+	if x < 0:
+		x = 0
+	return x
+
 class CheckSlots:
 
 	def __init__(self):
@@ -49,7 +54,7 @@ class CheckSlots:
 					'C2000':[1.2575, -3, 2.46, 1.2575, 0.74  , 0.4, 0, 0]}
 		#self.publish_slot(self.slots)
 
-		self.den = 16.0    #16.0 for 0.05 resolution; 4.0 for 0.1 resolution
+		self.den = 12.0    #16.0 for 0.05 resolution; 4.0 for 0.1 resolution
 		self.bias = 200.0
 		self.bias1 = 0.0
 
@@ -112,9 +117,9 @@ class CheckSlots:
 		print " %s %8d %8d %8d %8d %8d %8d" % ("B", self.slots["B2005"][6], self.slots["B2004"][6], self.slots["B2003"][6], self.slots["B2002"][6], self.slots["B2001"][6], self.slots["B2000"][6])
 		print " %s %8d %8d %8d %8d %8d %8d" % ("A", self.slots["A2005"][6], self.slots["A2004"][6], self.slots["A2003"][6], self.slots["A2002"][6], self.slots["A2001"][6], self.slots["A2000"][6])
 		print "\npercent(%):"
-		print " %s %8.1f %8.1f %8.1f %8.1f %8.1f %8.1f" % ("C", (self.slots["C2005"][6]-self.bias)/self.den*1.33, (self.slots["C2004"][6]-self.bias)/self.den*1.33, (self.slots["C2003"][6]-self.bias)/self.den*1.33, (self.slots["C2002"][6]-self.bias)/self.den*1.33, (self.slots["C2001"][6]-self.bias)/self.den*1.33, (self.slots["C2000"][6]-self.bias)/self.den*1.33)
-		print " %s %8.1f %8.1f %8.1f %8.1f %8.1f %8.1f" % ("B", (self.slots["B2005"][6]-self.bias)/self.den, (self.slots["B2004"][6]-self.bias)/self.den, (self.slots["B2003"][6]-self.bias)/self.den, (self.slots["B2002"][6]-self.bias)/self.den, (self.slots["B2001"][6]-self.bias)/self.den, (self.slots["B2000"][6]-self.bias)/self.den,)
-		print " %s %8.1f %8.1f %8.1f %8.1f %8.1f %8.1f" % ("A", (self.slots["A2005"][6]-self.bias1)/self.den, (self.slots["A2004"][6]-self.bias1)/self.den, (self.slots["A2003"][6]-self.bias1)/self.den, (self.slots["A2002"][6]-self.bias1)/self.den, (self.slots["A2001"][6]-self.bias1)/self.den, (self.slots["A2000"][6]-self.bias1)/self.den,)
+		print " %s %8.1f %8.1f %8.1f %8.1f %8.1f %8.1f" % ("C", pos((self.slots["C2005"][6]-self.bias)/self.den*1.33), pos((self.slots["C2004"][6]-self.bias)/self.den*1.33), pos((self.slots["C2003"][6]-self.bias)/self.den*1.33), pos((self.slots["C2002"][6]-self.bias)/self.den*1.33), pos((self.slots["C2001"][6]-self.bias)/self.den*1.33), pos((self.slots["C2000"][6]-self.bias)/self.den*1.33))
+		print " %s %8.1f %8.1f %8.1f %8.1f %8.1f %8.1f" % ("B", pos((self.slots["B2005"][6]-self.bias)/self.den), pos((self.slots["B2004"][6]-self.bias)/self.den), pos((self.slots["B2003"][6]-self.bias)/self.den), pos((self.slots["B2002"][6]-self.bias)/self.den), pos((self.slots["B2001"][6]-self.bias)/self.den), pos((self.slots["B2000"][6]-self.bias)/self.den))
+		print " %s %8.1f %8.1f %8.1f %8.1f %8.1f %8.1f" % ("A", pos((self.slots["A2005"][6]-self.bias1)/self.den), pos((self.slots["A2004"][6]-self.bias1)/self.den), pos((self.slots["A2003"][6]-self.bias1)/self.den), pos((self.slots["A2002"][6]-self.bias1)/self.den), pos((self.slots["A2001"][6]-self.bias1)/self.den), pos((self.slots["A2000"][6]-self.bias1)/self.den))
 		
 
 

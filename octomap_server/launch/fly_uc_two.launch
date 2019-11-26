@@ -7,8 +7,6 @@
   www.ros.org/wiki/octomap_server for details  
 -->
 <launch>
-
-	<node pkg="rosbag" type="play" name="player" args="--clock /home/jlew/bagfiles/uc/two_zeds_south.bag"/>
     <node pkg="topic_tools" type="throttle" args="messages /zedCloudsTransformed 1.0 /zedCloudsTransformed05" name="throttle_node" output="screen" />
     <node pkg="octomap_server" type="check_rack.py" name="check_rack_node" output="screen" />
 	<node pkg="octomap_server" type="octomap_server_node" name="octomap_server">
