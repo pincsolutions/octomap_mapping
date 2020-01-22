@@ -35,23 +35,23 @@ class CheckSlots:
 		self.fcu_pose_sub = rospy.Subscriber('/mavros/local_position/pose', PoseStamped, self.fcu_pose_callback)
 
 		self.slots = {
-					'101B1':[3.768, 0.0, 0, 1.2575, 1.23, 0.4, 0, 0],
-					'101B2':[3.768, 0.0, 1.23, 1.2575, 1.23, 0.4, 0,  0],
-					'101B3':[3.768, 0.0, 2.46, 1.2575, 0.94  , 0.4, 0, 0],
-					'101A1':[2.515, 0.0, 0, 1.2575, 1.23, 0.4, 0, 0],
-					'101A2':[2.515, 0.0, 1.23, 1.2575, 1.23, 0.4, 0, 0],
-					'101A3':[2.515, 0.0, 2.46, 1.2575, 0.94  , 0.4, 0, 0],
-					'100B1':[1.2575, 0.0, 0, 1.2575, 1.23, 0.4, 0, 0],
-					'100B2':[1.2575, 0.0, 1.23, 1.2575, 1.23, 0.4, 0, 0],
-					'100B3':[1.2575, 0.0, 2.46, 1.2575, 0.94  , 0.4, 0, 0],
-					'100A1':[0, 0.0, 0, 1.2575, 1.23, 0.4, 0, 0],
-					'100A2':[0, 0.0, 1.23, 1.2575, 1.23, 0.4, 0, 0],
-					'100A3':[0, 0.0, 2.46, 1.2575, 0.94  , 0.4, 0, 0]
+					'101B1':[3.768, 0.0, 0, 1.2575, 1.23, 0.4, [0,0,0,0,0]],
+					'101B2':[3.768, 0.0, 1.23, 1.2575, 1.23, 0.4, [0,0,0,0,0]],
+					'101B3':[3.768, 0.0, 2.46, 1.2575, 0.94  , 0.4, [0,0,0,0,0]],
+					'101A1':[2.515, 0.0, 0, 1.2575, 1.23, 0.4, [0,0,0,0,0]],
+					'101A2':[2.515, 0.0, 1.23, 1.2575, 1.23, 0.4, [0,0,0,0,0]],
+					'101A3':[2.515, 0.0, 2.46, 1.2575, 0.94  , 0.4, [0,0,0,0,0]],
+					'100B1':[1.2575, 0.0, 0, 1.2575, 1.23, 0.4, [0,0,0,0,0]],
+					'100B2':[1.2575, 0.0, 1.23, 1.2575, 1.23, 0.4, [0,0,0,0,0]],
+					'100B3':[1.2575, 0.0, 2.46, 1.2575, 0.94  , 0.4, [0,0,0,0,0]],
+					'100A1':[0, 0.0, 0, 1.2575, 1.23, 0.4, [0,0,0,0,0]],
+					'100A2':[0, 0.0, 1.23, 1.2575, 1.23, 0.4, [0,0,0,0,0]],
+					'100A3':[0, 0.0, 2.46, 1.2575, 0.94  , 0.4, [0,0,0,0,0]]
 					}
 		#self.publish_slot(self.slots)
 
-		self.den = 22.0    #16.0 for 0.05 resolution; 4.0 for 0.1 resolution
-		self.bias = 200.0
+		self.den = 8.0    #16.0 for 0.05 resolution; 4.0 for 0.1 resolution
+		self.bias = 50.0
 		self.bias1 = 200.0
 
 
@@ -63,7 +63,7 @@ class CheckSlots:
 		try:
 			# Convert Pointcloud2 into a list
 			xyz = ros_numpy.numpify(msg).tolist()
-			tree = KDTree(xyz)
+			#tree = KDTree(xyz)
 		except:
 			rospy.loginfo('Check_slots_node: bad incoming data in octomap_call_callback')
 			return
@@ -82,18 +82,32 @@ class CheckSlots:
 		print 'Total number of cells : ',len(xyz)
 		# print  'xyz: ',xyz[0][0]
 
-		# Intialize occupied cell counts and average depth
+
+		self.publish_slot(self.slots)
+
+
+		# # Intialize occupied cell counts and average depth
 		for key in self.slots:
-			self.slots[key][6] = 0
-			self.slots[key][7] = 0.
+			self.slots[key][6] = [0, 0, 0, 0, 0]
+		# 	self.slots[key][7] = 0.
 
 		# Check if each cell is within the designated slots and then add counts and depth
 		# Consider north flight 
 		for cell in xyz:
 			for key, value in self.slots.items():
-				if (value[0]<=cell[0]<=value[0]+value[3]) and (value[1]<=cell[1]<=value[1]+value[5]) and (value[2]<=cell[2]<=value[2]+value[4]):
-						value[6] += 1
-						value[7] += cell[1]
+				if (value[0]<=cell[0]<=value[0]+value[3]) and (value[1]<=cell[1]<=value[1]+0.1) and (value[2]<=cell[2]<=value[2]+value[4]):
+					value[6][0] += 1
+				elif (value[0]<=cell[0]<=value[0]+value[3]) and (value[1]+0.1<=cell[1]<=value[1]+0.2) and (value[2]<=cell[2]<=value[2]+value[4]):
+					value[6][1] +=1
+				elif (value[0]<=cell[0]<=value[0]+value[3]) and (value[1]+0.2<=cell[1]<=value[1]+0.3) and (value[2]<=cell[2]<=value[2]+value[4]):
+					value[6][2] +=1
+				elif (value[0]<=cell[0]<=value[0]+value[3]) and (value[1]+0.3<=cell[1]<=value[1]+0.4) and (value[2]<=cell[2]<=value[2]+value[4]):
+					value[6][3] +=1	
+				elif (value[0]<=cell[0]<=value[0]+value[3]) and (value[1]+0.4<=cell[1]<=value[1]+0.5) and (value[2]<=cell[2]<=value[2]+value[4]):
+					value[6][4] +=1	
+				else:
+					pass
+
 		
 		# Print the number of cells in the designated slot and its average depth of
 		"""for key, value in self.slots.items():
@@ -103,20 +117,24 @@ class CheckSlots:
 			else:
 				print key+" count: ", value[6]
 		"""
-		self.publish_slot(self.slots)
-
+		
+		print "\n"
+		print "3", self.slots["100A3"][6], self.slots["100B3"][6], self.slots["101A3"][6], self.slots["101B3"][6]
+		print "2", self.slots["100A2"][6], self.slots["100B2"][6], self.slots["101A2"][6], self.slots["101B2"][6]
+		print "1", self.slots["100A1"][6], self.slots["100B1"][6], self.slots["101A1"][6], self.slots["101B1"][6]
 		
 		print "\n      100A_    100B_    101A_    101B_"
-		print("counts/slot:")
+		print "counts/slot:"
 		#print "%8.2f %8.2f %8.2f %8.2f " % (self.slots["C2003"][7]/self.slots["C2003"][6],self.slots["C2002"][7]/self.slots["C2002"][6], self.slots["C2001"][7]/self.slots["C2001"][6], self.slots["C2000"][7]/self.slots["C2000"][6])
-		print " %s %8d %8d %8d %8d" % ("3", self.slots["100A3"][6], self.slots["100B3"][6], self.slots["101A3"][6], self.slots["101B3"][6])
-		print " %s %8d %8d %8d %8d" % ("2", self.slots["100A2"][6], self.slots["100B2"][6], self.slots["101A2"][6], self.slots["101B2"][6])
-		print " %s %8d %8d %8d %8d" % ("1", self.slots["100A1"][6], self.slots["100B1"][6], self.slots["101A1"][6], self.slots["101B1"][6])
+		print " %s %8d %8d %8d %8d" % ("3", max(self.slots["100A3"][6]), max(self.slots["100B3"][6]), max(self.slots["101A3"][6]), max(self.slots["101B3"][6]))
+		print " %s %8d %8d %8d %8d" % ("2", max(self.slots["100A2"][6]), max(self.slots["100B2"][6]), max(self.slots["101A2"][6]), max(self.slots["101B2"][6]))
+		print " %s %8d %8d %8d %8d" % ("1", max(self.slots["100A1"][6]), max(self.slots["100B1"][6]), max(self.slots["101A1"][6]), max(self.slots["101B1"][6]))
 		print "\npercent(%):"
-		print " %s %8.1f %8.1f %8.1f %8.1f" % ("3", pos((self.slots["100A3"][6]-self.bias)/self.den*1.33), pos((self.slots["100B3"][6]-self.bias)/self.den*1.33), pos((self.slots["101A3"][6]-self.bias)/self.den*1.33), pos((self.slots["B03F3B"][6]-self.bias)/self.den*1.33))
-		print " %s %8.1f %8.1f %8.1f %8.1f" % ("2", pos((self.slots["100A2"][6]-self.bias)/self.den), pos((self.slots["100B2"][6]-self.bias)/self.den), pos((self.slots["101A2"][6]-self.bias)/self.den), pos((self.slots["101B2"][6]-self.bias)/self.den))
-		print " %s %8.1f %8.1f %8.1f %8.1f" % ("1", pos((self.slots["100A1"][6]-self.bias1)/self.den), pos((self.slots["100B1"][6]-self.bias1)/self.den), pos((self.slots["101A1"][6]-self.bias1)/self.den), pos((self.slots["101B1"][6]-self.bias1)/self.den))
+		print " %s %8.1f %8.1f %8.1f %8.1f" % ("3", (max(self.slots["100A3"][6])-self.bias)/self.den, (max(self.slots["100B3"][6])-self.bias)/self.den, (max(self.slots["101A3"][6])-self.bias)/self.den, (max(self.slots["101B3"][6])-self.bias)/self.den)
+		print " %s %8.1f %8.1f %8.1f %8.1f" % ("2", (max(self.slots["100A2"][6])-self.bias)/self.den, (max(self.slots["100B2"][6])-self.bias)/self.den, (max(self.slots["101A2"][6])-self.bias)/self.den, (max(self.slots["101B2"][6])-self.bias)/self.den)
+		print " %s %8.1f %8.1f %8.1f %8.1f" % ("1", (max(self.slots["100A1"][6])-self.bias)/self.den, (max(self.slots["100B1"][6])-self.bias)/self.den, (max(self.slots["101A1"][6])-self.bias)/self.den, (max(self.slots["101B1"][6])-self.bias)/self.den)
 		
+
 
 
 		#print "   %8.2f %8.2f %8.2f %8.2f " % ( self.slots["C2003"][7]/self.slots["C2003"][6],self.slots["C2002"][7]/self.slots["C2002"][6], self.slots["C2001"][7]/self.slots["C2001"][6], self.slots["C2000"][7]/self.slots["C2000"][6])
@@ -159,7 +177,7 @@ class CheckSlots:
 if __name__ == '__main__':
 	print("Computing occupied cells and average depth.......")
 	rospy.init_node('check_slot_node', anonymous=True)
-	
+
 	CheckSlots()
 
 	rospy.spin()
