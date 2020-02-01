@@ -8,10 +8,10 @@
   www.ros.org/wiki/octomap_server for details  
 -->
 <launch>
-    
-       <node pkg="topic_tools" type="throttle" args="messages /zed1/point_cloud/cloud_registered" 1.0 /pc1_1" name="throttle_node" output="screen" />
 
-	<node pkg="octomap_server" type="modex_rack_layer.py" name="check_rack_node" output="screen" />
+	<node pkg="rosbag" type="play" name="player" output="log" args="--clock /home/jlew/bagfiles/uc/modex28-1.bag"/>
+
+	<node pkg="octomap_server" type="modex_rack_layer4.py" name="check_rack_node" output="screen" />
 
 	<node pkg="octomap_server" type="octomap_server_node" name="octomap_server">
 		<param name="resolution" value="0.05" />
@@ -35,7 +35,8 @@
         <param name="sensor_model/miss"   value="0.45" />    
 	
 		<!-- data source to integrate (PointCloud2) -->
-		<remap from="cloud_in" to="/pc_1" />
+		<remap from="cloud_in" to="/zed1/point_cloud/cloud_registered" />
 	</node>
-    
+    <!-- Launch rviz display-->
+	<node name="rviz" pkg="rviz" type="rviz" args="-d /home/jlew/octo.rviz" output="screen" />
 </launch>

@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+
+<launch>
+
+	<node pkg="rosbag" type="play" name="player" output="log" args="--clock /home/jlew/bagfiles/uc/modex30.bag"/>
+
+	<node pkg="octomap_server" type="modex_rack_layer4.py" name="check_rack_node" output="screen" />
+
+	<node pkg="octomap_server" type="octomap_server_node" name="octomap_server">
+		<param name="resolution" value="0.05" />
+		
+		<!-- fixed map frame (set to 'map' if SLAM or localization running!) -->
+		<param name="frame_id" type="string" value="map" />
+
+		<param name="height_map" value="false"  />
+		<!--<param name="color"  value="0.8"   />  -->
+
+		<!-- maximum range to integrate (speedup!) -->
+		<param name="sensor_model/max_range" value="2.7" />
+       
+	    <param name="pointcloud_min_z" value="0.05"/>
+	    <param name="pointcloud_max_z" value="3.1"/>
+
+        <param name="sensor_model/min" value="0.12"/>
+        <param name="sensor_model/max" value="0.9"/>
+
+        <param name="sensor_model/hit"   value="0.53" />
+        <param name="sensor_model/miss"   value="0.48" />    
+	
+		<!-- data source to integrate (PointCloud2) -->
+		<remap from="cloud_in" to="/zed1/point_cloud/cloud_registered" />
+	</node>
+    <!-- Launch rviz display-->
+	<node name="rviz" pkg="rviz" type="rviz" args="-d /home/jlew/octo.rviz" output="screen" />
+</launch>
