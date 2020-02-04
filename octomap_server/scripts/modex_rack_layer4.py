@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import os
 from scipy.spatial import KDTree, distance
 import rospy
 import ros_numpy
@@ -35,23 +36,23 @@ class CheckSlots:
 		self.fcu_pose_sub = rospy.Subscriber('/mavros/local_position/pose', PoseStamped, self.fcu_pose_callback)
 
 		self.slots = {
-					'101B1':[3.768, 0.0, 0, 1.2575, 1.23, 0.4, [0,0,0,0]],
-					'101B2':[3.768, 0.0, 1.23, 1.2575, 1.23, 0.4, [0,0,0,0]],
-					'101B3':[3.768, 0.0, 2.46, 1.2575, 0.70  , 0.4, [0,0,0,0]],
-					'101A1':[2.515, 0.0, 0, 1.2575, 1.23, 0.4, [0,0,0,0]],
-					'101A2':[2.515, 0.0, 1.23, 1.2575, 1.23, 0.4, [0,0,0,0]],
-					'101A3':[2.515, 0.0, 2.46, 1.2575, 0.70  , 0.4, [0,0,0,0]],
-					'100B1':[1.2575, 0.0, 0, 1.2575, 1.23, 0.4, [0,0,0,0]],
-					'100B2':[1.2575, 0.0, 1.23, 1.2575, 1.23, 0.4, [0,0,0,0]],
-					'100B3':[1.2575, 0.0, 2.46, 1.2575, 0.70  , 0.4, [0,0,0,0]],
-					'100A1':[0, 0.0, 0, 1.2575, 1.23, 0.4, [0,0,0,0]],
-					'100A2':[0, 0.0, 1.23, 1.2575, 1.23, 0.4, [0,0,0,0]],
-					'100A3':[0, 0.0, 2.46, 1.2575, 0.70  , 0.4, [0,0,0,0]]
+					'101B1':[3.768, 0.0, 0, 1.2575, 1.23, 0.9, [0,0,0,0]],
+					'101B2':[3.768, 0.0, 1.23, 1.2575, 1.23, 0.9, [0,0,0,0]],
+					'101B3':[3.768, 0.0, 2.46, 1.2575, 0.70  , 0.9, [0,0,0,0]],
+					'101A1':[2.515, 0.0, 0, 1.2575, 1.23, 0.9, [0,0,0,0]],
+					'101A2':[2.515, 0.0, 1.23, 1.2575, 1.23, 0.9, [0,0,0,0]],
+					'101A3':[2.515, 0.0, 2.46, 1.2575, 0.70  , 0.9, [0,0,0,0]],
+					'100B1':[1.2575, 0.0, 0, 1.2575, 1.23, 0.9, [0,0,0,0]],
+					'100B2':[1.2575, 0.0, 1.23, 1.2575, 1.23, 0.9, [0,0,0,0]],
+					'100B3':[1.2575, 0.0, 2.46, 1.2575, 0.70  , 0.9, [0,0,0,0]],
+					'100A1':[0, 0.0, 0, 1.2575, 1.23, 0.9, [0,0,0,0]],
+					'100A2':[0, 0.0, 1.23, 1.2575, 1.23, 0.9, [0,0,0,0]],
+					'100A3':[0, 0.0, 2.46, 1.2575, 0.70  , 0.9, [0,0,0,0]]
 					}
 		#self.publish_slot(self.slots)
 
-		self.den = 9.2    #16.0 for 0.05 resolution; 4.0 for 0.1 resolution
-		self.bias = 80.0
+		self.den = 9.0    #16.0 for 0.05 resolution; 4.0 for 0.1 resolution
+		self.bias = 20.0
 		self.bias1 = 200.0
 
 
@@ -116,27 +117,28 @@ class CheckSlots:
 				print key+" count: ", value[6]
 		"""
 		
-		print "\n"
-		print "3", self.slots["100A3"][6], self.slots["100B3"][6], self.slots["101A3"][6], self.slots["101B3"][6]
-		print "2", self.slots["100A2"][6], self.slots["100B2"][6], self.slots["101A2"][6], self.slots["101B2"][6]
-		print "1", self.slots["100A1"][6], self.slots["100B1"][6], self.slots["101A1"][6], self.slots["101B1"][6]
+		# print "\n"
+		# print "3", self.slots["100A3"][6], self.slots["100B3"][6], self.slots["101A3"][6], self.slots["101B3"][6]
+		# print "2", self.slots["100A2"][6], self.slots["100B2"][6], self.slots["101A2"][6], self.slots["101B2"][6]
+		# print "1", self.slots["100A1"][6], self.slots["100B1"][6], self.slots["101A1"][6], self.slots["101B1"][6]
 		
-		print "\n      100A_    100B_    101A_    101B_"
-		print "counts/slot:"
-		#print "%8.2f %8.2f %8.2f %8.2f " % (self.slots["C2003"][7]/self.slots["C2003"][6],self.slots["C2002"][7]/self.slots["C2002"][6], self.slots["C2001"][7]/self.slots["C2001"][6], self.slots["C2000"][7]/self.slots["C2000"][6])
-		print " %s %8d %8d %8d %8d" % ("3", max(self.slots["100A3"][6]), max(self.slots["100B3"][6]), max(self.slots["101A3"][6]), max(self.slots["101B3"][6]))
-		print " %s %8d %8d %8d %8d" % ("2", max(self.slots["100A2"][6]), max(self.slots["100B2"][6]), max(self.slots["101A2"][6]), max(self.slots["101B2"][6]))
-		print " %s %8d %8d %8d %8d" % ("1", max(self.slots["100A1"][6]), max(self.slots["100B1"][6]), max(self.slots["101A1"][6]), max(self.slots["101B1"][6]))
+		#print "\n      100A_    100B_    101A_    101B_"
+		# print "counts/slot:"
+		# #print "%8.2f %8.2f %8.2f %8.2f " % (self.slots["C2003"][7]/self.slots["C2003"][6],self.slots["C2002"][7]/self.slots["C2002"][6], self.slots["C2001"][7]/self.slots["C2001"][6], self.slots["C2000"][7]/self.slots["C2000"][6])
+		# print " %s %8d %8d %8d %8d" % ("3", max(self.slots["100A3"][6]), max(self.slots["100B3"][6]), max(self.slots["101A3"][6]), max(self.slots["101B3"][6]))
+		# print " %s %8d %8d %8d %8d" % ("2", max(self.slots["100A2"][6]), max(self.slots["100B2"][6]), max(self.slots["101A2"][6]), max(self.slots["101B2"][6]))
+		# print " %s %8d %8d %8d %8d" % ("1", max(self.slots["100A1"][6]), max(self.slots["100B1"][6]), max(self.slots["101A1"][6]), max(self.slots["101B1"][6]))
 		
 		# print "\npercent(%):"
 		# print " %s %8.1f %8.1f %8.1f %8.1f" % ("3", (max(self.slots["100A3"][6])-self.bias)/self.den*2, (max(self.slots["100B3"][6])-self.bias)/self.den*2, (max(self.slots["101A3"][6])-self.bias)/self.den*2, (max(self.slots["101B3"][6])-self.bias)/self.den*2)
 		# print " %s %8.1f %8.1f %8.1f %8.1f" % ("2", (max(self.slots["100A2"][6])-self.bias)/self.den, (max(self.slots["100B2"][6])-self.bias)/self.den, (max(self.slots["101A2"][6])-self.bias)/self.den, (max(self.slots["101B2"][6])-self.bias)/self.den)
 		# print " %s %8.1f %8.1f %8.1f %8.1f" % ("1", (max(self.slots["100A1"][6])-self.bias)/self.den, (max(self.slots["100B1"][6])-self.bias)/self.den, (max(self.slots["101A1"][6])-self.bias)/self.den, (max(self.slots["101B1"][6])-self.bias)/self.den)
 		
-		print "\npercent(%):"
-		print " %s %8.1f %8.1f %8.1f %8.1f" % ("3", self.pos((max(self.slots["100A3"][6])-self.bias)/self.den*2), self.pos((max(self.slots["100B3"][6])-self.bias)/self.den*2), self.pos((max(self.slots["101A3"][6])-self.bias)/self.den*2), self.pos((max(self.slots["101B3"][6])-self.bias)/self.den*2))
-		print " %s %8.1f %8.1f %8.1f %8.1f" % ("2", self.pos((max(self.slots["100A2"][6])-self.bias)/self.den), self.pos((max(self.slots["100B2"][6])-self.bias)/self.den), self.pos((max(self.slots["101A2"][6])-self.bias)/self.den), self.pos((max(self.slots["101B2"][6])-self.bias)/self.den))
-		print " %s %8.1f %8.1f %8.1f %8.1f" % ("1", self.pos((max(self.slots["100A1"][6])-self.bias)/self.den), self.pos((max(self.slots["100B1"][6])-self.bias)/self.den), self.pos((max(self.slots["101A1"][6])-self.bias)/self.den), self.pos((max(self.slots["101B1"][6])-self.bias)/self.den))
+		print "\n Occupancy Percent(%):"
+		print "      100A_    100B_    101A_    101B_"
+		print " %s %8d %8d %8d %8d" % ("3", self.pos((max(self.slots["100A3"][6])-self.bias)/self.den*2), self.pos((max(self.slots["100B3"][6])-self.bias)/self.den*2), self.pos((max(self.slots["101A3"][6])-self.bias)/self.den*2), self.pos((max(self.slots["101B3"][6])-self.bias)/self.den*2))
+		print " %s %8d %8d %8d %8d" % ("2", self.pos((max(self.slots["100A2"][6])-self.bias)/self.den), self.pos((max(self.slots["100B2"][6])-self.bias)/self.den), self.pos((max(self.slots["101A2"][6])-self.bias)/self.den), self.pos((max(self.slots["101B2"][6])-self.bias)/self.den))
+		print " %s %8d %8d %8d %8d" % ("1", self.pos((max(self.slots["100A1"][6])-self.bias)/self.den), self.pos((max(self.slots["100B1"][6])-self.bias)/self.den), self.pos((max(self.slots["101A1"][6])-self.bias)/self.den), self.pos((max(self.slots["101B1"][6])-self.bias)/self.den))
 
 
 		#print "   %8.2f %8.2f %8.2f %8.2f " % ( self.slots["C2003"][7]/self.slots["C2003"][6],self.slots["C2002"][7]/self.slots["C2002"][6], self.slots["C2001"][7]/self.slots["C2001"][6], self.slots["C2000"][7]/self.slots["C2000"][6])
@@ -204,5 +206,6 @@ if __name__ == '__main__':
 	rospy.init_node('check_slot_node', anonymous=True)
 
 	CheckSlots()
-
+	os.system('echo -ne "\033]0;OCCUPANCY\007"')
+	
 	rospy.spin()
