@@ -580,7 +580,7 @@ void OctomapServer::publishAll(const ros::Time& rostime){
             m_octree->getMetricMin(minX, minY, minZ);
             m_octree->getMetricMax(maxX, maxY, maxZ);
 
-            double d = (1.0 - std::min(std::max((cubeCenter.x-minX)/ (maxX - minX), 0.0), 1.0)) *m_colorFactor;
+            double d = (1.0 - std::min(std::max((cubeCenter.y-minY)/ (maxY - minY), 0.0), 1.0)) *m_colorFactor;
             occupiedNodesVis.markers[idx].colors.push_back(heightMapColor(d));
           }
 
